@@ -1,0 +1,77 @@
+wordcloud
+官网: https://amueller.github.io/word_cloud/ 
+github: https://github.com/amueller/word_cloud
+
+
+# 安装
+## 方法1
+`pip install wordcloud`
+
+## 方法2
+- github下载并解压
+```
+wget  https://github.com/amueller/word_cloud/archive/master.zip
+unzip master.zip
+rm master.zip
+cd word_cloud-master
+```
+- 安装依赖包
+`sudo pip install -r requirements.txt`
+- 安装wordcloud
+`python setup.py install`
+
+## 方法3
+- 下载[.whl文件](http://www.lfd.uci.edu/~gohlke/pythonlibs/#wordcloud)
+- 使用cd命令进入whl文件的路径
+- 运行这条命令：
+`python -m pip install <filename> `
+
+
+# 依赖包
+jieba、wordcloud、scipy、matplotlib
+解决问题的过程中，重新安装PIL。
+
+
+# 使用方法
+1. 首先尝试实现使用，使用的是wordcloud官方示例，进行英语云词图的绘制。
+2. 使用https://github.com/fyuanfen/wordcloud，但是代码问题太多，修改完善。
+3. 通过wordtest.py实现制作福字的云图。
+
+
+# 运行中遇到的问题
+使用的是https://github.com/fyuanfen/wordcloud里的代码进行修改。但是这里面代码与我有一定的兼容问题，所以进行了部分问题解决的尝试。
+
+1. Windows系统下，报错The _imagingft C module is not installed.
+使用以下方法解决。重新安装PIL
+http://blog.csdn.net/ivy94419/article/details/50921771
+
+2. TypeError: Image data can not convert to float
+网上的解释是 imshow() takes a ndarray as an argument, and not a dictionary.
+意思很明显需要使用ndarray格式的数组。
+plt.figure()
+plt.imshow(wc.recolor(color_func=image_colors))
+plt.figure()
+plt.imshow(image_colors, cmap=plt.cm.gray)	#运行此句话报错，说明不能直接使用image_colors的格式。所以改成
+plt.imshow(wc.recolor(color_func=image_colors), cmap=plt.cm.gray)
+
+3. IOError: cannot open resource
+解决这个问题需要考虑文件路径是否正确。这问题的原因是找不到文件，说明路径存在问题。在调用WordCloud的时候，在使用中文分词并在制作中文词云的时候是需要考虑使用中文字体的。
+wc = WordCloud( font_path = path + '叶立群几何体.ttf',
+但是在解决这个问题的时候用绝对路径也没有，发现根本原因是含有中文字符，导致 WordCloud无法识别，将.ttf文件改格式后可以使用。
+wc = WordCloud( font_path = './font/jiankai.ttf',
+
+4. 读取中文文档问题
+一直读取中文文档失败，报错。
+修改了两处，如下：
+    #f = open(filename, 'r', encoding='utf-8')
+    f = open(filename, 'r')
+	
+        #stopwords[line] = 1
+        stopwords[line.decode('utf-8')] = 1
+中文文档成功正常读取。并能进行分词。同时发现下载的代码中中文文档都是默认编码，并不是utf-8，不知道他是怎么使用成功的。
+
+
+# 参考:
+http://www.cnblogs.com/Yiutto/p/5998296.html
+https://github.com/fyuanfen/wordcloud
+http://blog.sina.com.cn/s/blog_4a238ec20102w0az.html
